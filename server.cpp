@@ -13,7 +13,7 @@ Server::Server(QObject *parent)
     Capture->DxGiInit();
 
     Framesend_th=new FrameDealer(this);
-    //Framesend_th->start();//帧处理,发送子线程
+    Framesend_th->start();//帧处理,发送子线程
 
 }
 
@@ -40,10 +40,10 @@ void Server::ScreenCapture()
 
         //QPixmap piximage=QPixmap::fromImage(image);
         if(!image.isNull()){
-            //FrameBufferMutex.lock();
-            //FrameBuffer.append(image);
+            FrameBufferMutex.lock();
+            FrameBuffer.append(image);
             emit sendFrame(image);
-            //FrameBufferMutex.unlock();
+            FrameBufferMutex.unlock();
         }
 
         else
@@ -61,15 +61,15 @@ FrameDealer::FrameDealer(QObject *parent):QThread(parent)
 
 void FrameDealer::run()//子线程主事件
 {
-    // QImage firstImage;
-    // while(1){
-    //     FrameBufferMutex.lock();
-    //     if(!FrameBuffer.isEmpty()){
-    //         firstImage=FrameBuffer.takeFirst();
-    //     }
-    //     FrameBufferMutex.unlock();
-    //     //帧处理
-    //     FFmpegWorker->FFmpegImageDeal(firstImage);
-    //     //帧发送
-    // }
+    QImage firstImage;
+    while(1){
+        FrameBufferMutex.lock();
+        if(!FrameBuffer.isEmpty()){
+            firstImage=FrameBuffer.takeFirst();
+        }
+        FrameBufferMutex.unlock();
+        //帧处理
+        FFmpegWorker->FFmpegImageDeal(firstImage);
+        //帧发送
+    }
 }

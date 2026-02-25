@@ -11,5 +11,5 @@ void FFmpeg::FFmpegInit()
 
 void FFmpeg::FFmpegImageDeal(const QImage &image)
 {
-    //qDebug()<<"deal frame::"<<image.size();
+    qDebug()<<"deal frame::"<<image.size();
 }
