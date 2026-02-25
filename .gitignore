@@ -1,0 +1,76 @@
+# ========================= Qt 核心编译产物 =========================
+# 构建目录（Qt Creator 默认构建目录）
+build*/
+cmake-build-*/
+# Makefile 及编译中间文件
+Makefile
+*.mak
+*.mk
+*.o
+*.obj
+*.objcopy
+*.objdump
+*.a
+*.lib
+*.so
+*.so.*
+*.dll
+*.dylib
+*.pdb
+*.idb
+*.exp
+*.ilk
+*.map
+*.sym
+# Qt 生成的 moc/uic/rcc 文件
+moc_*.cpp
+moc_*.h
+ui_*.h
+qrc_*.cpp
+# Qt 资源文件编译产物
+*.rcc
+# Qt 自动生成的头文件
+*.qm
+*.qrc.depends
+*.qrc.cache
+# ========================= IDE 配置文件 =========================
+# Qt Creator
+*.user
+*.user.debug
+*.user.release
+*.autosave
+# Visual Studio
+.vs/
+*.vcxproj.user
+*.vcxproj.filters
+*.vcxproj.cache
+*.suo
+*.sdf
+*.opensdf
+*.ipch
+# CLion/Qt Creator CMake
+CMakeLists.txt.user
+cmake_install.cmake
+CMakeCache.txt
+CTestTestfile.cmake
+# ========================= 系统/临时文件 =========================
+# macOS
+.DS_Store
+*.dSYM/
+# Windows
+Thumbs.db
+desktop.ini
+# 日志/备份文件
+*.log
+*.bak
+*.tmp
+*.swp
+*~
+# ========================= 其他 Qt 相关 =========================
+# Qt Designer 临时文件
+*.ui.save
+# Qt Linguist 临时文件
+*.ts~
+*.qm~
+# Qt 插件编译产物
+*.pri.save
