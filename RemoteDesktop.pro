@@ -25,6 +25,23 @@ HEADERS += \
     server.h \
     widget.h
 LIBS += -ld3d11 -ldxgi
+INCLUDEPATH += $$PWD/ffmpeg-8.0.1-full_build-shared/include
+LIBS += -L$$PWD/ffmpeg-8.0.1-full_build-shared/lib \
+        -lavcodec \
+        -lavutil \
+        -lswscale
+
+DEFINES += _CRT_SECURE_NO_WARNINGS
+CONFIG += link_c++
+
+# 自动复制 DLL
+win32 {
+    COPIES += FFMpegDlls
+    FFMpegDlls.files = $$PWD/ffmpeg-8.0.1-full_build-shared/bin/avcodec-62.dll \
+                       $$PWD/ffmpeg-8.0.1-full_build-shared/bin/avutil-60.dll \
+                       $$PWD/ffmpeg-8.0.1-full_build-shared/bin/swscale-9.dll
+    FFMpegDlls.path = $$OUT_PWD/debug
+}
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
