@@ -11,6 +11,7 @@ CONFIG += c++17
 SOURCES += \
     client.cpp \
     displayui.cpp \
+    ffmpeg_server/ffmpeg.cpp \
     loginui.cpp \
     main.cpp \
     mdxgi.cpp \
@@ -20,6 +21,7 @@ SOURCES += \
 HEADERS += \
     client.h \
     displayui.h \
+    ffmpeg_server/ffmpeg.h \
     loginui.h \
     mdxgi.h \
     server.h \

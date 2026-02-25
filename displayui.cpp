@@ -35,7 +35,7 @@ DisplayUI::~DisplayUI()
 void DisplayUI::resizeEvent(QResizeEvent *event)//外部被自动调用
 {
     QWidget::resizeEvent(event);
-    qDebug()<<"event->size()"<<event->size();
-    qDebug()<<"this->label->size()"<<this->ui->label->size();
+    //qDebug()<<"event->size()"<<event->size();
+    //qDebug()<<"this->label->size()"<<this->ui->label->size();
 
 }

@@ -2,17 +2,18 @@
 #include"mdxgi.h"
 #include<windows.h>
 
-extern "C"{
-#include <libavcodec/avcodec.h>
-#include <libavutil/avutil.h>
-}
+
+QVector<QImage> FrameBuffer;//帧缓冲区
+QMutex FrameBufferMutex=QMutex();
+
 Server::Server(QObject *parent)
     : QTcpServer{parent}
 {
     Capture=new DxGI(this);
     Capture->DxGiInit();
 
-    Framesend_th=new QThread(this);
+    Framesend_th=new FrameDealer(this);
+    //Framesend_th->start();//帧处理,发送子线程
 
 }
 
@@ -39,8 +40,10 @@ void Server::ScreenCapture()
 
         //QPixmap piximage=QPixmap::fromImage(image);
         if(!image.isNull()){
-            FrameBuffer.append(image);
+            //FrameBufferMutex.lock();
+            //FrameBuffer.append(image);
             emit sendFrame(image);
+            //FrameBufferMutex.unlock();
         }
 
         else
@@ -50,8 +53,23 @@ void Server::ScreenCapture()
 
 }
 
-void Server::DealAndSendFrame(const QImage&image)
+FrameDealer::FrameDealer(QObject *parent):QThread(parent)
 {
-    qDebug()<<"get a frame from server!!";
-    //使用ffmpeg处理并发送帧,多线程
+    FFmpegWorker=new FFmpeg(this);//创建ffmpeg对象
+    FFmpegWorker->FFmpegInit();
+}
+
+void FrameDealer::run()//子线程主事件
+{
+    // QImage firstImage;
+    // while(1){
+    //     FrameBufferMutex.lock();
+    //     if(!FrameBuffer.isEmpty()){
+    //         firstImage=FrameBuffer.takeFirst();
+    //     }
+    //     FrameBufferMutex.unlock();
+    //     //帧处理
+    //     FFmpegWorker->FFmpegImageDeal(firstImage);
+    //     //帧发送
+    // }
 }

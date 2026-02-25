@@ -12,6 +12,10 @@
 #include <mdxgi.h>
 #include<QVector>
 #include<QThread>
+#include<QMutex>
+#include"ffmpeg_server/ffmpeg.h"
+
+
 class Server : public QTcpServer
 {
     Q_OBJECT
@@ -19,15 +23,24 @@ public:
     explicit Server(QObject *parent = nullptr);
     QTcpSocket *ClientSocket=0;
     DxGI *Capture=nullptr;
-    QVector<QImage> FrameBuffer;
     QThread *Framesend_th=nullptr;
+
 
     void ServerRun();
     void ScreenCapture();//截图,与上一帧对比,不同再发，只发不同的区域，非异步
-    void DealAndSendFrame(const QImage&image);//编解码,发送帧
 signals:
     void SocketIsOk();
     void sendFrame(const QImage&image);
+    void FrameDealerStart();
 };
+class FrameDealer:public QThread
+{
+    Q_OBJECT
+public:
 
+    explicit FrameDealer(QObject *parent=nullptr);
+    FFmpeg *FFmpegWorker=nullptr;
+    void run()override;
+
+};
 #endif // SERVER_H
