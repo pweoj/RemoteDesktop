@@ -160,7 +160,7 @@ QImage DxGI::DxGetOneFrame()
         texWidth,
         texHeight,
         mapped.RowPitch,
-        QImage::Format_ARGB32
+        QImage::Format_RGBA8888
         );
 
     QImage fixedImage = image.copy(0, 0, texWidth, texHeight).rgbSwapped();

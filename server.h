@@ -39,7 +39,6 @@ class FrameDealer:public QThread
 public:
 
     explicit FrameDealer(QObject *parent=nullptr);
-    FFmpeg *FFmpegWorker=nullptr;
     void run()override;
 
 };

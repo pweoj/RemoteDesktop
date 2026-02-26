@@ -41,7 +41,9 @@ win32 {
     COPIES += FFMpegDlls
     FFMpegDlls.files = $$PWD/ffmpeg-8.0.1-full_build-shared/bin/avcodec-62.dll \
                        $$PWD/ffmpeg-8.0.1-full_build-shared/bin/avutil-60.dll \
-                       $$PWD/ffmpeg-8.0.1-full_build-shared/bin/swscale-9.dll
+                       $$PWD/ffmpeg-8.0.1-full_build-shared/bin/swscale-9.dll \
+                       $$PWD/ffmpeg-8.0.1-full_build-shared/bin/swresample-6.dll
+
     FFMpegDlls.path = $$OUT_PWD/debug
 }
 # Default rules for deployment.
