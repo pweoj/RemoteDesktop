@@ -27,11 +27,11 @@ public:
 
 
     bool FFmpegInit();
-    void FFmpegImageDeal(const QImage&image,int m_frameIndex);
+    QByteArray FFmpegImageDeal(const QImage&image,int m_frameIndex);
     void SendFrameToClient();
 
 signals:
-    void FramToPacketIsOk(QByteArray H264Data,int index);
+    void FramToPacketIsOk(const QByteArray& H264Data);
 };
 
 #endif // FFMPEG_H

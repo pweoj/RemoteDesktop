@@ -58,10 +58,10 @@ bool FFmpeg::FFmpegInit()
 
 }
 
-void FFmpeg::FFmpegImageDeal(const QImage &image,int m_frameIndex)
+QByteArray FFmpeg::FFmpegImageDeal(const QImage &image,int m_frameIndex)
 {
-    qDebug()<<"deal frame::"<<image.size();
-    if(!m_codec_flage) return;
+    //qDebug()<<"deal frame::"<<image.size();
+    if(!m_codec_flage) return NULL;
 
     QImage m_image=image.convertToFormat(QImage::Format_RGB888);
     //RGB转YUV********
@@ -76,14 +76,17 @@ void FFmpeg::FFmpegImageDeal(const QImage &image,int m_frameIndex)
 
     int ret=avcodec_send_frame(m_codecCtx,m_inputYuv);//发送帧到编码器缓冲区
 
-    while(ret>=0){//循环读取编码器输出的h.264 packet包
-        ret=avcodec_receive_packet(m_codecCtx,m_pkt);
-        if(ret == AVERROR(EAGAIN)){
-            continue;
-            QThread::msleep(1);
-        }
-        QByteArray h264data((const char*)m_pkt->data,m_pkt->size);
-        emit FramToPacketIsOk(h264data,m_pkt->pts);
-    }
+    int packetCount = 0;
+    ret = avcodec_receive_packet(m_codecCtx,m_pkt);
+    if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF){;}
+    //packetCount++;
+
+
+     QByteArray h264data((const char*)m_pkt->data,m_pkt->size);
+     //qDebug()<<"[FFmpeg]pcksize:"<<h264data.size();
+     //qDebug()<<"[FFmpeg]pck_index"<<m_pkt->pts;
+    av_packet_unref(m_pkt);
+
+    return h264data;
 
 }

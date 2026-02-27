@@ -7,88 +7,91 @@ QVector<QImage> FrameBuffer;//帧缓冲区
 QMutex FrameBufferMutex=QMutex();
 QVector<QByteArray> SendBuffer;//发送缓冲区
 QMutex SendMutex=QMutex();
-FFmpeg *FFmpegWorker=nullptr;
-
 
 Server::Server(QObject *parent)
     : QTcpServer{parent}
 {
-    Capture=new DxGI(this);
-    Capture->DxGiInit();
+    Capture=new DxGI;
+    FrameDeal=new FrameDealer;
+    CaptureTh=new QThread(this);//截图线程
+    FramDealTh=new QThread(this);
 
-    Framesend_th=new FrameDealer(this);
-    Framesend_th->start();//帧处理,发送子线程
+    FrameDeal->moveToThread(FramDealTh);
+    FramDealTh->start();
+    connect(this,&Server::SocketIsOk,FrameDeal,&FrameDealer::FramDealerRun);
+    bool ok=connect(FrameDeal,&FrameDealer::ToServer,this,&Server::SendFrameByte);
+    qDebug()<<"[OK]:"<<ok;
 
+    Capture->moveToThread(CaptureTh);
+    CaptureTh->start();
+    connect(Capture,&DxGI::CaptureIsOk,this,&Server::DealCaptureFrame);
+    connect(this,&Server::StartCpatureTh,Capture,&DxGI::DxCaptureScreen);
 
 }
 
 void Server::ServerRun()
 {
     qDebug()<<"Server Start...";
-    connect(this,&Server::SocketIsOk,&Server::ScreenCapture);
+    connect(this,&Server::SocketIsOk,&Server::StartCpatureTh);//连接一建立就开截屏
+
     connect(this,&QTcpServer::newConnection,[=](){
         ClientSocket=this->nextPendingConnection();
         this->close();
         qDebug()<<"new connection...";
         emit SocketIsOk();
     });//有新连接
-    connect(FFmpegWorker,&FFmpeg::FramToPacketIsOk,[=](QByteArray H264Data,int m_index){
-        qDebug()<<"index of the packet(after h246):"<<m_index;});
-
 
     listen(QHostAddress::Any,PORT);//非阻塞
     //while(1);
 }
 
-void Server::ScreenCapture()
+void Server::SendFrameByte(const QByteArray& H264Data)
 {
-    //connect(this,&Server::sendFrame,&Server::DealAndSendFrame);
-    while (1) {
-        QImage image=Capture->DxGetOneFrame();
-
-        //QPixmap piximage=QPixmap::fromImage(image);
-        if(!image.isNull()){
-            FrameBufferMutex.lock();
-            FrameBuffer.append(image);
-            emit sendFrame(image);
-            FrameBufferMutex.unlock();
-        }
-
-        else
-            qDebug()<<"no frame";
-        Sleep(5);
-    }
-
+    qDebug()<<"[Server]byte send...";
+    this->ClientSocket->write(H264Data);
 }
 
-FrameDealer::FrameDealer(QObject *parent):QThread(parent)
+void Server::DealCaptureFrame(const QImage &image)//截的屏放缓冲区
 {
-    FFmpegWorker=new FFmpeg(this);//创建ffmpeg对象
+    //qDebug()<<"[Server]*****";
+    FrameBufferMutex.lock();
+    FrameBuffer.append(image);
+    emit sendFrame(image);
+    FrameBufferMutex.unlock();
+}
+
+
+FrameDealer::FrameDealer(QObject *parent)
+{
+    FFmpegWorker=new FFmpeg(this);
     FFmpegWorker->FFmpegInit();
-
-
 }
 
-void FrameDealer::run()//子线程主事件
+void FrameDealer::FramDealerRun()
 {
     QImage firstImage;
-    int index=0;
-    while(1){
-        FrameBufferMutex.lock();
-        if(!FrameBuffer.isEmpty()){
-            firstImage=FrameBuffer.takeFirst();
-            index++;
-        }
-        else{
+        QByteArray pck;
+        int index=0;
+        while(!QThread::currentThread()->isInterruptionRequested()){
+            //qDebug()<<"[FrameDealer]run...";
+            FrameBufferMutex.lock();
+            if(!FrameBuffer.isEmpty()){
+                firstImage=FrameBuffer.takeFirst();
+                index++;
+            }
+            else{
+                FrameBufferMutex.unlock();
+                QThread::msleep(10);
+                continue;
+            }
             FrameBufferMutex.unlock();
-            QThread::msleep(1);
-            continue;
+            pck=FFmpegWorker->FFmpegImageDeal(firstImage.scaled(1024,640,Qt::KeepAspectRatio,Qt::FastTransformation),
+                                          index);
+            if(pck.size()!=0){
+
+                emit ToServer(pck);
+                qDebug()<<pck.size();
+            }
+            QThread::msleep(5);
         }
-        FrameBufferMutex.unlock();
-        //帧处理
-        //qDebug()<<"index of the packet(after h246):"<<index;
-        FFmpegWorker->FFmpegImageDeal(firstImage.scaled(1024,640,Qt::KeepAspectRatio,Qt::FastTransformation),
-                                      index);
-        //帧发送
-    }
 }

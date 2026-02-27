@@ -13,9 +13,21 @@
 #include<QVector>
 #include<QThread>
 #include<QMutex>
+#include<QByteArray>
 #include"ffmpeg_server/ffmpeg.h"
+//*********************************************
+class FrameDealer:public QObject
+{
+    Q_OBJECT
+public:
+    explicit FrameDealer(QObject *parent=nullptr);
+    FFmpeg *FFmpegWorker=nullptr;
+    void FramDealerRun();
+signals:
+    void ToServer(const QByteArray& H264Data);
+};
 
-
+//*********************************************
 class Server : public QTcpServer
 {
     Q_OBJECT
@@ -23,23 +35,20 @@ public:
     explicit Server(QObject *parent = nullptr);
     QTcpSocket *ClientSocket=0;
     DxGI *Capture=nullptr;
-    QThread *Framesend_th=nullptr;
+    FrameDealer *FrameDeal=nullptr;
+    QThread*CaptureTh=nullptr;
+    QThread *FramDealTh=nullptr;
 
 
     void ServerRun();
     void ScreenCapture();//截图,与上一帧对比,不同再发，只发不同的区域，非异步
+    void SendFrameByte(const QByteArray& H264Data);
+    void DealCaptureFrame(const QImage&image);
 signals:
     void SocketIsOk();
     void sendFrame(const QImage&image);
     void FrameDealerStart();
+    void StartCpatureTh();
 };
-class FrameDealer:public QThread
-{
-    Q_OBJECT
-public:
 
-    explicit FrameDealer(QObject *parent=nullptr);
-    void run()override;
-
-};
 #endif // SERVER_H

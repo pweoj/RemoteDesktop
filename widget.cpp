@@ -65,6 +65,7 @@ void Widget::TestDisplay()
 {
     DisplayUI *displayui=new DisplayUI(this);
     connect(SerWork,&Server::sendFrame,displayui,&DisplayUI::DisplayToLabel);
+
 }
 
 Widget::~Widget() {}

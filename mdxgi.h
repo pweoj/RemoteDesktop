@@ -2,7 +2,7 @@
 #define MDXGI_H
 
 #include <QObject>
-
+#include<QThread>
 #include<QDebug>
 //typedef unsigned int UINT;
 class DxGI : public QObject
@@ -13,7 +13,8 @@ public:
     ~DxGI();
 
     bool DxGiInit();
-    QImage DxGetOneFrame();
+    bool DxGetOneFrame();
+    void DxCaptureScreen();
 
 private:
     void* device = nullptr;
@@ -23,5 +24,7 @@ private:
 
     unsigned int texWidth = 0;
     unsigned int texHeight = 0;
+signals:
+    void CaptureIsOk(const QImage &image);
 };
 #endif // MDXGI_H
