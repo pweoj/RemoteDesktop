@@ -1,35 +1,29 @@
 #ifndef CLIENT_H
 #define CLIENT_H
 
-#include <QObject>
 #include <QTcpSocket>
-#include<QHostAddress>
-#include<QImage>
-#include<QThread>
-#include<QDebug>
+#include <QImage>
+#include "ffmpeg_server/frameuncode.h"
+
 class Client : public QTcpSocket
 {
     Q_OBJECT
 public:
-    Client();
+    explicit Client(QObject *parent = nullptr);
     QHostAddress SerIp;
-    int SerPort;
+    quint16 SerPort = 3232;
     void ClientRun();
-    void ConfirmMode();//ConfirmMode with Server
+
 signals:
-   void ConnectIsOk();
-    void ReciveImage(const QImage&image);
+    void ConnectIsOk();
+    void frameReady(QImage frame);  // 转发解码后的图像
 
-};
-class FrameUncode:public QObject
-{
-    Q_OBJECT
-public:
+private:
+    FrameUncode *m_decoder = nullptr;
 
-    explicit FrameUncode(QObject *parent=nullptr);
-    void UncodeInit();//初始化解码
-    void UncodeDev(const QImage&image);//解码
+
 
 
 };
-#endif // CLIENT_H
+
+#endif

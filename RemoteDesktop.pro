@@ -12,6 +12,7 @@ SOURCES += \
     client.cpp \
     displayui.cpp \
     ffmpeg_server/ffmpeg.cpp \
+    ffmpeg_server/frameuncode.cpp \
     loginui.cpp \
     main.cpp \
     mdxgi.cpp \
@@ -22,6 +23,7 @@ HEADERS += \
     client.h \
     displayui.h \
     ffmpeg_server/ffmpeg.h \
+    ffmpeg_server/frameuncode.h \
     loginui.h \
     mdxgi.h \
     server.h \

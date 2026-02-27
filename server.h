@@ -28,6 +28,7 @@ signals:
 };
 
 //*********************************************
+
 class Server : public QTcpServer
 {
     Q_OBJECT
