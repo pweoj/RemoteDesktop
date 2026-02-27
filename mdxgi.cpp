@@ -291,7 +291,7 @@ void DxGI::DxCaptureScreen()
     // 修复：可中断循环+休眠，降低CPU占用
     while (!QThread::currentThread()->isInterruptionRequested()) {
         DxGetOneFrame();
-        QThread::msleep(5); // 5ms休眠，避免高频调用
+        QThread::msleep(5);
     }
 
     qDebug() << "[DxCaptureScreen] 截屏循环正常退出";

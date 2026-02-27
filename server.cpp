@@ -90,7 +90,7 @@ void FrameDealer::FramDealerRun()
             if(pck.size()!=0){
 
                 emit ToServer(pck);
-                qDebug()<<pck.size();
+                //qDebug()<<pck.size();
             }
             QThread::msleep(5);
         }
