@@ -58,13 +58,15 @@ void Widget::ClientThreadCreat()
     ClientWork->moveToThread(CliTh);
     CliTh->start();
 
+    DisplayUI *displayui=new DisplayUI(this);
+    connect(ClientWork, &Client::frameReady,displayui,&DisplayUI::DisplayToLabel);
 
 }
 
 void Widget::TestDisplay()
 {
-    DisplayUI *displayui=new DisplayUI(this);
-    connect(SerWork,&Server::sendFrame,displayui,&DisplayUI::DisplayToLabel);
+    // DisplayUI *displayui=new DisplayUI(this);
+    // connect(client, &Client::frameReady,displayui,&DisplayUI::DisplayToLabel);
 
 }
 

@@ -47,8 +47,15 @@ void Server::ServerRun()
 
 void Server::SendFrameByte(const QByteArray& H264Data)
 {
-    qDebug()<<"[Server]byte send...";
-    this->ClientSocket->write(H264Data);
+    quint32 len = H264Data.size();
+    QByteArray packet;
+    packet.append((len >> 24) & 0xFF);  // 最高8位 → 0x00
+    packet.append((len >> 16) & 0xFF);  // 次高8位 → 0x00
+    packet.append((len >> 8)  & 0xFF);  // 次低8位 → 0x06
+    packet.append( len        & 0xFF);  // 最低8位 → 0x04
+    packet.append(H264Data);
+    this->ClientSocket->write(packet);
+    qDebug()<<"[Server]send"<<packet.size()<<"bytes *** H16="<<packet.left(16).toHex(' ');
 }
 
 void Server::DealCaptureFrame(const QImage &image)//截的屏放缓冲区
@@ -56,7 +63,7 @@ void Server::DealCaptureFrame(const QImage &image)//截的屏放缓冲区
     //qDebug()<<"[Server]*****";
     FrameBufferMutex.lock();
     FrameBuffer.append(image);
-    emit sendFrame(image);
+    //emit sendFrame(image);
     FrameBufferMutex.unlock();
 }
 
